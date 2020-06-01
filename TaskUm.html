@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css"> 
 <style type="text/css">
     #the-canvas {
         cursor: move;
@@ -6,69 +7,92 @@
 
 
 <div class="row skeleton"> <!-- Start Skeleton Row-->
-    <div class="col-md-12"><!-- Start of Question and Submission DIV (column) -->
+<div class="col-md-12"><!-- Start of Question and Submission DIV (column) -->
 
-      <p style="font-size:40px;" id="Titulo"></p>
+    <p style="font-size:40px;padding: 20px;" id="Titulo">
+    
+    </p>
 
-<div class="row skeleton">
-    <!-- Answer buttons -->
-    <div id="answer" class="col-md-12 col-lg-8" style="text-align:center;">
-        <div id="YesNoIDK">
-            <!-- If the user clicks this button, the saved answer will be value="yes"-->
-            <button class="btn btn-success btn-answer" value='Yes'>Yes</button>
-            <!-- If the user clicks this button, the saved answer will be value="no"-->
-            <button class="btn btn-danger btn-answer" value='No'>No</button>
-            <!-- If the user clicks this button, the saved answer will be value="NotKnown"-->
-            <button class="btn btn-answer" value='NotKnown'>I don't know</button>
+    <div class="row skeleton">
+        <!-- Answer buttons -->
+        <div id="answer" class="col-md-12 col-lg-8" style="text-align:center;">
+            <div id="YesNoIDK" style="padding-bottom: 15px;">
+                <!-- If the user clicks this button, the saved answer will be value="yes"-->
+                <button class="btn btn-success btn-answer" value='Yes'>Yes</button>
+                <!-- If the user clicks this button, the saved answer will be value="no"-->
+                <button class="btn btn-danger btn-answer" value='No'>No</button>
+                <!-- If the user clicks this button, the saved answer will be value="NotKnown"-->
+                <button class="btn btn-answer" value='NotKnown'>I don't know</button>
+            </div>
+
+            <!-- TASK 4 | Multiple choice -->
+            <div class="ui multiple selection dropdown" id="MultipleChoice">
+                <i class="dropdown icon"></i>
+                <div class="default text">Tag Multiple Categories></div>
+                <select multiple="" id="multi-select">
+                    <option value="BS"> Biological Sciences</option>
+                    <option value= "MHS"> Medical and Health Sciences</option>
+                    <option value = "MS"> Mathematical Sciences</option>
+                    <option value = "CS"> Chemical Sciences</option>
+                    <option value = "ES"> Earth Sciences</option>
+                    <option value = "PCS"> Psychology and Cognitive Sciences</option>
+                </select>
+                <button class="btn btn-success btn-answer" value='Yes'>Submit</button>
+                
+                <p>
+                    For article-field pairs that are not self-evident, please explain your reasoning: 
+                    <input type="text" id="fname" name="fname"><br><br>
+                </p>
+                
+            </div>
+            
+            <p id="task2_confidence">
+                <label>What is your level of confidence about this decision? [1 to 5]   </label>
+                <input type="text" size="5" >
+            </p>
+
+            <!-- PDF SECTION -->
+            <table style="width:100%">
+                <tr>
+                    <td>    
+                        <div class="btn-group btn-group-sm" style="padding-bottom:5px;">
+                            <button id="prevBtn" class="btn btn-navigate disabled" value="prev"><i class="fa fa-arrow-left"></i></button>
+                            <button class="btn btn-zoom" id="zoom" value=0>1:1</button>
+                            <button class="btn btn-zoom" id="zoom" value=1><i class="fa fa-white fa-search-plus"></i></button>
+                            <button class="btn btn-zoom" id="zoom" value=-1><i class="fa fa-white fa-search-minus"></i></button>
+                            <button id="nextBtn" class="btn btn-navigate" value="next"><i class="fa fa-arrow-right"></i></button>
+                        </div>
+                        <div id="pages" style="margin-top:2%;">
+                        <p>Page <span id="currentPage">#</span> of <span id="totalPages">#</span></p>
+                        </div>
+                        <div id="canvas_holder" style="margin-top:2%;"></div>                  
+                    </td>
+                    <td id="PDF_2">
+                        <div class="btn-group btn-group-sm" style="padding-bottom:5px;">
+                            <button id="prevBtn_2" class="btn btn-navigate disabled" value="prev_2"><i class="fa fa-arrow-left"></i></button>
+                            <button class="btn btn-zoom" id="zoom_2" value=0>1:1</button>
+                            <button class="btn btn-zoom" id="zoom_2" value=1><i class="fa fa-white fa-search-plus"></i></button>
+                            <button class="btn btn-zoom" id="zoom_2" value=-1><i class="fa fa-white fa-search-minus"></i></button>
+                            <button id="nextBtn_2" class="btn btn-navigate" value="next_2"><i class="fa fa-arrow-right"></i></button>
+                        </div>
+                        <div id="pages_2" style="margin-top:2%;">
+                        <p>Page <span id="currentPage_2">#</span> of <span id="totalPages_2">#</span></p>
+                        </div>  
+                        <div id="canvas_holder_2" style="margin-top:2%;"></div>  
+                    </td>
+                </tr>
+            </table>   
         </div>
-        
-        <p id="task2_confidence">
-            <label>What is your level of confidence about this decision? [1 to 5]   </label>
-            <input type="text" size="5" >
-        </p>
+        <div class="col-md-12 col-lg-4">
+            <p>You are working now on task: <span id="task-id" class="label label-warning">#</span></p>
+            <p>You have completed: <span id="done" class="label label-info"></span> tasks from
+            <span id="total" class="label label-inverse"></span></p>
+            <div class="progress progress-striped">
+                <div id="progress" rel="tooltip" title="#" class="progress-bar" style="width: 0%;"></div>
+            </div>
 
-        <!-- PDF SECTION -->
-        <table style="width:100%">
-            <tr>
-                <td>    
-                    <div class="btn-group btn-group-sm" style="padding-bottom:5px;">
-                        <button id="prevBtn" class="btn btn-navigate disabled" value="prev"><i class="fa fa-arrow-left"></i></button>
-                        <button class="btn btn-zoom" id="zoom" value=0>1:1</button>
-                        <button class="btn btn-zoom" id="zoom" value=1><i class="fa fa-white fa-search-plus"></i></button>
-                        <button class="btn btn-zoom" id="zoom" value=-1><i class="fa fa-white fa-search-minus"></i></button>
-                        <button id="nextBtn" class="btn btn-navigate" value="next"><i class="fa fa-arrow-right"></i></button>
-                    </div>
-                    <div id="pages" style="margin-top:2%;">
-                      <p>Page <span id="currentPage">#</span> of <span id="totalPages">#</span></p>
-                    </div>
-                    <div id="canvas_holder" style="margin-top:2%;"></div>                  
-                </td>
-                <td id="PDF_2">
-                    <div class="btn-group btn-group-sm" style="padding-bottom:5px;">
-                        <button id="prevBtn_2" class="btn btn-navigate disabled" value="prev_2"><i class="fa fa-arrow-left"></i></button>
-                        <button class="btn btn-zoom" id="zoom_2" value=0>1:1</button>
-                        <button class="btn btn-zoom" id="zoom_2" value=1><i class="fa fa-white fa-search-plus"></i></button>
-                        <button class="btn btn-zoom" id="zoom_2" value=-1><i class="fa fa-white fa-search-minus"></i></button>
-                        <button id="nextBtn_2" class="btn btn-navigate" value="next_2"><i class="fa fa-arrow-right"></i></button>
-                    </div>
-                    <div id="pages_2" style="margin-top:2%;">
-                      <p>Page <span id="currentPage_2">#</span> of <span id="totalPages_2">#</span></p>
-                    </div>  
-                    <div id="canvas_holder_2" style="margin-top:2%;"></div>  
-                </td>
-            </tr>
-        </table>   
-     </div>
-    <div class="col-md-12 col-lg-4">
-        <p>You are working now on task: <span id="task-id" class="label label-warning">#</span></p>
-        <p>You have completed: <span id="done" class="label label-info"></span> tasks from
-        <span id="total" class="label label-inverse"></span></p>
-        <div class="progress progress-striped">
-            <div id="progress" rel="tooltip" title="#" class="progress-bar" style="width: 0%;"></div>
         </div>
-
     </div>
-</div>
 </div>
 </div>
 
@@ -77,6 +101,12 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.2.228/pdf.min.js"></script>
 <script src="/static/js/pdf/dragscrollable.js"></script>
 <script src="/static/js/pdf/pdf.js" type="text/javascript" ></script>
+<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+<script> 
+    $('#multi-select')
+    .dropdown()
+    ;
+</script>
 
 <script type="text/javascript">
 (function() {
@@ -85,6 +115,7 @@
 // the script to be loaded, and currently do not allow cross-origin scripts)
 //
 $('#task2_confidence').hide();
+$('#MultipleChoice').hide();
 
 PDFJS.disableWorker = true;
 //
@@ -304,7 +335,7 @@ pybossa.taskLoaded(function(task, deferred){
         task.pagination_2 = (task.info.page === undefined);
 		task.pageNum_2 = task.info.page || 1;
 
-      PDFJS.getDocument("/static/raya2015.pdf").then(function getPdfHelloWorld(_pdfDoc) {
+      PDFJS.getDocument("/static/"+task.info.pdfName).then(function getPdfHelloWorld(_pdfDoc) {
             task.pdfDoc = _pdfDoc;
 			task.pdfDoc_2 = _pdfDoc;
             $("#totalPages").text(task.pdfDoc.numPages);
@@ -323,42 +354,52 @@ pybossa.presentTask(function(task, deferred){
         loadUserProgress();
         
         switch(task.id){
-            case 1438:
-                $('#Titulo').html("Do these papers belong to the same author (</strong>"+task.info.author1+"</strong>)?");
-                break;
-                
-            case 1439:
-                $('#Titulo').html("For the articles shown below, please indicate if they belong to the same author.  (</strong>"+task.info.author1+"</strong>)?");
+            //TASK 1
+            case 1462:
+                $('#Titulo').html("Do these papers belong to the same author (<strong>"+task.info.author1+"</strong>)?");
                 break;
             
-            case 1440:
-                $('#Titulo').html("Is '</strong>"+task.info.author1+"</strong>' the corresponding author of this paper?");
+            //TASK 2    
+            case 1463:
+                $('#Titulo').html("For the articles shown below, please indicate if they belong to the same author.  (<strong>"+task.info.author1+"</strong>)?");
+                break;
+            
+            //TASK 3
+            case 1464:
+                $('#Titulo').html("Is '<strong>"+task.info.author1+"</strong>' the corresponding author of this paper?");
                 break;
 
-            case 1441:
+            //TASK 4
+            case 1465:
                 $('#Titulo').html("Please classify this article into (at least) one of the following fields of research*:");
                 break;
             
-            case 1442:
+            //TASK 5
+            case 1466:
                 $('#Titulo').html("Are you able to find information about the affiliation of the main author?");
                 break;
-
-            case 1443:
+            
+            //TASK 6
+            case 1467:
                 $('#Titulo').html("Do the authors make a claim about the method used in their study?");
                 break;
         }
 
         //$('#author1').html(task.info.author1);
-        if(task.id==1441 || task.id==1443){ //tasks 4 e 6 não tem respostas "sim, não ou não sei"
+        if(task.id==1465 || task.id==1467){ //tasks 4 e 6 não tem respostas "sim, não ou não sei"
             $('#YesNoIDK').hide();
         }
 
-        if(!(task.id==1438 || task.id==1439)){ //apenas mostra 2º pdf na primeira e segunda tasks
+        if(!(task.id==1462 || task.id==1463)){ //apenas mostra 2º pdf na primeira e segunda tasks
             $('#PDF_2').remove();
         }
 
-        if(task.id==1439){
+        if(task.id==1463){ //TASK 2
             $('#task2_confidence').show();
+        }
+
+        if(task.id==1465){ //TASK 4
+            $('#MultipleChoice').show();
         }
 
         $("textarea#text").val('');
