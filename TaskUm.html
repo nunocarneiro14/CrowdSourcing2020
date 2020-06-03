@@ -444,7 +444,7 @@ pybossa.presentTask(function(task, deferred){
             var answer = $("textarea#text").val();
             $("#viewport_" + task.id).hide();
             pybossa.saveTask(task.id, answer).done(function(data){
-                //deferred.resolve();
+                deferred.resolve();
                 $("#success").fadeIn();
                 setTimeout(function() { $("#success").fadeOut() }, 2000);
             })
