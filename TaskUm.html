@@ -356,8 +356,8 @@ pybossa.taskLoaded(function(task, deferred){
 });
 
 pybossa.presentTask(function(task, deferred){
+    loadUserProgress();
     if ( !$.isEmptyObject(task) ) {
-        loadUserProgress();
         
         switch(task.info.id){
             //TASK 1
@@ -460,14 +460,13 @@ pybossa.presentTask(function(task, deferred){
             }
         });
         $(".btn-answer").off('click').on('click', function(){
-            var answer;
             switch(task.info.id){
                 case "1":
-                    answer = {'answer': $(this).attr("value")};
+                    var answer = {'answer': $(this).attr("value")};
                     break;
                 case "2":
                     if(document.getElementById('confidenceInput').value!=null){
-                        answer = {
+                        var answer = {
                             'answer': $(this).attr("value"),
                             'confidence': document.getElementById('confidenceInput').value
                         };
@@ -478,12 +477,12 @@ pybossa.presentTask(function(task, deferred){
                     break;
 
                 case "3":
-                    answer = {'answer': $(this).attr("value")};
+                    var answer = {'answer': $(this).attr("value")};
                     break;
                 
                 case "4":
                     if(document.getElementById('fname').value!=null){
-                        answer = {
+                        var answer = {
                             'answer': $('#multi-select').val(),
                             'reasoning': document.getElementById('fname').value
                         };
@@ -495,7 +494,7 @@ pybossa.presentTask(function(task, deferred){
                 
                 case "5":
                     if(document.getElementById('text').value!=null){
-                        answer = {
+                        var answer = {
                             'answer': $(this).attr("value"),
                             'info': document.getElementById('text').value
                         };
@@ -507,7 +506,7 @@ pybossa.presentTask(function(task, deferred){
                 
                 case "6":
                     if(document.getElementById('text').value!=null){
-                        answer = {
+                        var answer = {
                             'answer': $(this).attr("value"),
                             'info': document.getElementById('text').value
                         };
@@ -523,10 +522,10 @@ pybossa.presentTask(function(task, deferred){
 
             if (typeof answer != 'undefined') {
                 $("#viewport_" + task.id).hide();
-                pybossa.saveTask(task.id, answer).done(function(data){
-                    //deferred.resolve();
-                    $("#success").fadeIn();
-                    setTimeout(function() { $("#success").fadeOut() }, 2000);
+                pybossa.saveTask(task.id, answer).done(function(){
+                    deferred.resolve();
+                    //$("#success").fadeIn();
+                    //setTimeout(function() { $("#success").fadeOut() }, 2000);
                 })
             }
             else {
@@ -537,7 +536,7 @@ pybossa.presentTask(function(task, deferred){
     else {
         $(".skeleton").hide();
         pybossaNotify("Thanks! You have participated in all available tasks. Enjoy some of your time!", true, "info");
-        $("#finish").fadeIn();
+        //$("#finish").fadeIn();
     }
 });
 pybossa.setEndpoint('https://reality.utad.net/pybossa');
