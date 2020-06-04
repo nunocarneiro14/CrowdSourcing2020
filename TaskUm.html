@@ -53,6 +53,7 @@
                 <form class="form-inline">
                     <textarea id="text" rows="3" style="width:100%;"></textarea>
                 </form>
+                <button id="t6button" class="btn btn-success btn-answer">Submit</button>
             </div>
 
             <!-- PDF SECTION -->
@@ -412,6 +413,7 @@ pybossa.presentTask(function(task, deferred){
         if(task.info.id=="5"){ //TASK 5
             $('#T5info').show();
             $('#T5infoTitle').html("Copy and paste the affiliation of the main author here:");
+            $('#t6button').remove();
         }
 
         if(task.info.id=="6"){ //TASK 6
