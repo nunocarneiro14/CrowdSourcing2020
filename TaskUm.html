@@ -9,9 +9,7 @@
 <div class="row skeleton"> <!-- Start Skeleton Row-->
 <div class="col-md-12"><!-- Start of Question and Submission DIV (column) -->
 
-    <p style="font-size:40px;padding: 20px;" id="Titulo">
-    
-    </p>
+    <p style="font-size:40px;padding: 20px;" id="Titulo"></p>
 
     <div class="row skeleton">
         <!-- Answer buttons -->
@@ -37,8 +35,7 @@
                     <option value = "ES"> Earth Sciences</option>
                     <option value = "PCS"> Psychology and Cognitive Sciences</option>
                 </select>
-                <button class="btn btn-success btn-answer" value='Yes'>Submit</button>
-                
+                <button class="btn btn-success btn-answer">Submit</button>
                 <p>
                     For article-field pairs that are not self-evident, please explain your reasoning: 
                     <input type="text" id="fname" name="fname"><br><br>
@@ -48,14 +45,21 @@
             
             <p id="task2_confidence">
                 <label>What is your level of confidence about this decision? [1 to 5]   </label>
-                <input type="text" size="5" >
+                <input type="text" size="5" id="confidenceInput">
             </p>
+
+            <div id="T5info">
+                <h5 id="T5infoTitle"></h5>
+                <form class="form-inline">
+                    <textarea id="text" rows="3" style="width:100%;"></textarea>
+                </form>
+            </div>
 
             <!-- PDF SECTION -->
             <table style="width:100%">
                 <tr>
                     <td>    
-                        <div class="btn-group btn-group-sm" style="padding-bottom:5px;">
+                        <div class="btn-group btn-group-sm" style="padding-bottom:5px;padding-top: 10px;">
                             <button id="prevBtn" class="btn btn-navigate disabled" value="prev"><i class="fa fa-arrow-left"></i></button>
                             <button class="btn btn-zoom" id="zoom" value=0>1:1</button>
                             <button class="btn btn-zoom" id="zoom" value=1><i class="fa fa-white fa-search-plus"></i></button>
@@ -116,6 +120,7 @@
 //
 $('#task2_confidence').hide();
 $('#MultipleChoice').hide();
+$('#T5info').hide();
 
 PDFJS.disableWorker = true;
 //
@@ -353,56 +358,69 @@ pybossa.presentTask(function(task, deferred){
     if ( !$.isEmptyObject(task) ) {
         loadUserProgress();
         
-        switch(task.id){
+        switch(task.info.id){
             //TASK 1
-            case 1462:
+            case "1":
                 $('#Titulo').html("Do these papers belong to the same author (<strong>"+task.info.author1+"</strong>)?");
                 break;
             
             //TASK 2    
-            case 1463:
+            case "2":
                 $('#Titulo').html("For the articles shown below, please indicate if they belong to the same author.  (<strong>"+task.info.author1+"</strong>)?");
                 break;
             
             //TASK 3
-            case 1464:
+            case "3":
                 $('#Titulo').html("Is '<strong>"+task.info.author1+"</strong>' the corresponding author of this paper?");
                 break;
 
             //TASK 4
-            case 1465:
+            case "4":
                 $('#Titulo').html("Please classify this article into (at least) one of the following fields of research*:");
                 break;
             
             //TASK 5
-            case 1466:
+            case "5":
                 $('#Titulo').html("Are you able to find information about the affiliation of the main author?");
                 break;
             
             //TASK 6
-            case 1467:
+            case "6":
                 $('#Titulo').html("Do the authors make a claim about the method used in their study?");
+                break;
+            default:
                 break;
         }
 
         //$('#author1').html(task.info.author1);
-        if(task.id==1465 || task.id==1467){ //tasks 4 e 6 não tem respostas "sim, não ou não sei"
+        if(task.info.id=="4" || task.info.id=="6"){ //tasks 4 e 6 não tem respostas "sim, não ou não sei"
             $('#YesNoIDK').hide();
         }
 
-        if(!(task.id==1462 || task.id==1463)){ //apenas mostra 2º pdf na primeira e segunda tasks
+        if(!(task.info.id=="1" || task.info.id=="2")){ //apenas mostra 2º pdf na primeira e segunda tasks
             $('#PDF_2').remove();
         }
 
-        if(task.id==1463){ //TASK 2
+        if(task.info.id=="2"){ //TASK 2
             $('#task2_confidence').show();
         }
 
-        if(task.id==1465){ //TASK 4
+        if(task.info.id=="4"){ //TASK 4
             $('#MultipleChoice').show();
         }
 
-        $("textarea#text").val('');
+        if(task.info.id=="5"){ //TASK 5
+            $('#T5info').show();
+            $('#T5infoTitle').html("Copy and paste the affiliation of the main author here:");
+        }
+
+        if(task.info.id=="6"){ //TASK 6
+            $('#T5info').show();
+            $('#T5infoTitle').html("Copy and paste the method here:");
+        }
+
+
+        //$("textarea#text").val('');
         $("#viewport_" + task.id).show();
         // showPaginationOptions(task);
         renderPage(task);
@@ -440,17 +458,83 @@ pybossa.presentTask(function(task, deferred){
             }
         });
         $(".btn-answer").off('click').on('click', function(){
-            var answer = $("textarea#text").val();
-            $("#viewport_" + task.id).hide();
-            pybossa.saveTask(task.id, answer).done(function(data){
-                //deferred.resolve();
-                $("#success").fadeIn();
-                setTimeout(function() { $("#success").fadeOut() }, 2000);
-            })
+            var answer;
+            switch(task.info.id){
+                case "1":
+                    answer = {'answer': $(this).attr("value")};
+                    break;
+                case "2":
+                    if(document.getElementById('confidenceInput').value!=null){
+                        answer = {
+                            'answer': $(this).attr("value"),
+                            'confidence': document.getElementById('confidenceInput').value
+                        };
+                    }
+                    else{
+                        pybossaNotify("Ooops! You have to fill all the fields.", true, "error");
+                    }
+                    break;
+
+                case "3":
+                    answer = {'answer': $(this).attr("value")};
+                    break;
+                
+                case "4":
+                    if(document.getElementById('fname').value!=null){
+                        answer = {
+                            'answer': $('#multi-select').val(),
+                            'reasoning': document.getElementById('fname').value
+                        };
+                    }
+                    else{
+                        pybossaNotify("Ooops! You have to fill all the fields.", true, "error");
+                    }
+                    break;
+                
+                case "5":
+                    if(document.getElementById('text').value!=null){
+                        answer = {
+                            'answer': $(this).attr("value"),
+                            'info': document.getElementById('text').value
+                        };
+                    }
+                    else{
+                        pybossaNotify("Ooops! You have to fill all the fields.", true, "error");
+                    }
+                    break;
+                
+                case "6":
+                    if(document.getElementById('text').value!=null){
+                        answer = {
+                            'answer': $(this).attr("value"),
+                            'info': document.getElementById('text').value
+                        };
+                    }
+                    else{
+                        pybossaNotify("Ooops! You have to fill all the fields.", true, "error");
+                    }
+                    break;
+                
+                default:
+                    break;
+            }
+
+            if (typeof answer != 'undefined') {
+                $("#viewport_" + task.id).hide();
+                pybossa.saveTask(task.id, answer).done(function(data){
+                    //deferred.resolve();
+                    $("#success").fadeIn();
+                    setTimeout(function() { $("#success").fadeOut() }, 2000);
+                })
+            }
+            else {
+                pybossaNotify("Ooops! Something went wrong!", true, "error");
+            }
         });
     }
     else {
         $(".skeleton").hide();
+        pybossaNotify("Thanks! You have participated in all available tasks. Enjoy some of your time!", true, "info");
         $("#finish").fadeIn();
     }
 });
