@@ -45,13 +45,13 @@
             
             <p id="task2_confidence">
                 <label>What is your level of confidence about this decision? [1 to 5]   </label>
-                <input type="text" size="5" id="confidenceInput">
+                <input type="number" id="confidenceInput" name="confidenceInput" min="1" max="5">
             </p>
 
             <div id="T5info">
                 <h5 id="T5infoTitle"></h5>
                 <form class="form-inline">
-                    <textarea id="text" rows="3" style="width:100%;"></textarea>
+                    <textarea id="textT5" rows="3" style="width:100%;"></textarea>
                 </form>
                 <button id="t6button" class="btn btn-success btn-answer">Submit</button>
             </div>
@@ -119,9 +119,6 @@
 // Disable workers to avoid yet another cross-origin issue (workers need the URL of
 // the script to be loaded, and currently do not allow cross-origin scripts)
 //
-$('#task2_confidence').hide();
-$('#MultipleChoice').hide();
-$('#T5info').hide();
 
 PDFJS.disableWorker = true;
 //
@@ -144,20 +141,6 @@ function renderPage(task) {
   });
 }
 
-function renderPage_2(task) {
-  $("#currentPage_2").text(task.pageNum_2);
-  task.pdfDoc_2.getPage(task.pageNum_2).then(function(page) {
-    var viewport = page.getViewport(task.scale_2);
-    task.canvas_2.height = viewport.height;
-    task.canvas_2.width = viewport.width;
-    // Render PDF page into canvas context
-    var renderContext = {
-      canvasContext: task.ctx_2,
-      viewport: viewport
-    };
-    page.render(renderContext);
-  });
-}
 
 function zoom(task, v) {
     task.pdfDoc.getPage(task.pageNum).then(function(page){
@@ -179,26 +162,7 @@ function zoom(task, v) {
         renderPage(task);
     });
 }
-function zoom_2(task, v) {
-    task.pdfDoc.getPage(task.pageNum).then(function(page){
-        if (v === 1) {
-            task.scale_2 = task.scale_2 + 0.1;
-            if (task.scale_2 >= 2) {
-                task.scale_2 = 2;
-            }
-        }
-        if (v === -1) {
-            task.scale_2 = task.scale_2 - 0.1;
-            if (task.scale_2 <= 0) {
-                task.scale_2 = 0.1;
-            }
-        }
-        if (v === 0) {
-            task.scale_2 = 0.8;
-        }
-        renderPage_2(task);
-    });
-}
+
 function enableDisabledNavButtons(task){
     if (task.pageNum === 1) {
         $("#nextBtn").removeClass("disabled");
@@ -213,17 +177,19 @@ function enableDisabledNavButtons(task){
         $("#prevBtn").removeClass("disabled");
     }
 
-    if (task.pageNum_2 === 1) {
-        $("#nextBtn_2").removeClass("disabled");
-        $("#prevBtn_2").addClass("disabled");
-    }
-    else if (task.pageNum_2 === task.pdfDoc_2.numPages) {
-        $("#prevBtn_2").removeClass("disabled");
-        $("#nextBtn_2").addClass("disabled");
-    }
-    else {
-        $("#nextBtn_2").removeClass("disabled");
-        $("#prevBtn_2").removeClass("disabled");
+    if(task.info.id=="1"||task.info.id=="2"){
+        if (task.pageNum_2 === 1) {
+            $("#nextBtn_2").removeClass("disabled");
+            $("#prevBtn_2").addClass("disabled");
+        }
+        else if (task.pageNum_2 === task.pdfDoc_2.numPages) {
+            $("#prevBtn_2").removeClass("disabled");
+            $("#nextBtn_2").addClass("disabled");
+        }
+        else {
+            $("#nextBtn_2").removeClass("disabled");
+            $("#prevBtn_2").removeClass("disabled");
+        }
     }
 }
 
@@ -234,15 +200,6 @@ function goPreviousPage(task) {
     renderPage(task);
     $("#currentPage").text(task.pageNum);
     $("#totalPages").text(task.pdfDoc.numPages);
-    enableDisabledNavButtons(task);
-}
-function goPreviousPage_2(task) {
-    if (task.pageNum_2 <= 1)
-        return;
-    task.pageNum_2--;
-    renderPage_2(task);
-    $("#currentPage_2").text(task.pageNum_2);
-    $("#totalPages_2").text(task.pdfDoc_2.numPages);
     enableDisabledNavButtons(task);
 }
 
@@ -256,15 +213,7 @@ function goNextPage(task) {
     enableDisabledNavButtons(task);
 
 }
-function goNextPage_2(task) {
-    if (task.pageNum_2 >= task.pdfDoc_2.numPages)
-        return;
-    task.pageNum_2++;
-    renderPage_2(task);
-    $("#currentPage_2").text(task.pageNum_2);
-    $("#totalPages_2").text(task.pdfDoc_2.numPages);
-    enableDisabledNavButtons(task);
-}
+
 
 function loadUserProgress() {
     pybossa.userProgress('Crowd').done(function(data){
@@ -289,6 +238,63 @@ function showPaginationOptions(task) {
         $("#pages").hide();
     }
 }
+
+function renderPage_2(task) {
+$("#currentPage_2").text(task.pageNum_2);
+task.pdfDoc_2.getPage(task.pageNum_2).then(function(page) {
+    var viewport = page.getViewport(task.scale_2);
+    task.canvas_2.height = viewport.height;
+    task.canvas_2.width = viewport.width;
+    // Render PDF page into canvas context
+    var renderContext = {
+    canvasContext: task.ctx_2,
+    viewport: viewport
+    };
+    page.render(renderContext);
+});
+}
+
+function zoom_2(task, v) {
+    task.pdfDoc.getPage(task.pageNum).then(function(page){
+        if (v === 1) {
+            task.scale_2 = task.scale_2 + 0.1;
+            if (task.scale_2 >= 2) {
+                task.scale_2 = 2;
+            }
+        }
+        if (v === -1) {
+            task.scale_2 = task.scale_2 - 0.1;
+            if (task.scale_2 <= 0) {
+                task.scale_2 = 0.1;
+            }
+        }
+        if (v === 0) {
+            task.scale_2 = 0.8;
+        }
+        renderPage_2(task);
+    });
+}
+
+function goPreviousPage_2(task) {
+    if (task.pageNum_2 <= 1)
+        return;
+    task.pageNum_2--;
+    renderPage_2(task);
+    $("#currentPage_2").text(task.pageNum_2);
+    $("#totalPages_2").text(task.pdfDoc_2.numPages);
+    enableDisabledNavButtons(task);
+}
+
+function goNextPage_2(task) {
+    if (task.pageNum_2 >= task.pdfDoc_2.numPages)
+        return;
+    task.pageNum_2++;
+    renderPage_2(task);
+    $("#currentPage_2").text(task.pageNum_2);
+    $("#totalPages_2").text(task.pdfDoc_2.numPages);
+    enableDisabledNavButtons(task);
+}
+
 function showPaginationOptions_2(task) {
     if (task.pagination_2) {
         $("#currentPage_2").text(task.pageNum_2);
@@ -302,6 +308,7 @@ function showPaginationOptions_2(task) {
         $("#pages_2").hide();
     }
 }
+
 pybossa.taskLoaded(function(task, deferred){
     if ( !$.isEmptyObject(task) ) {
         $('#author1').html(task.info.author1);
@@ -332,20 +339,27 @@ pybossa.taskLoaded(function(task, deferred){
         task.scale = 0.9;
         task.pagination = (task.info.page === undefined);
         task.pageNum = task.info.page || 1;
-        var canvas_2 = $("<canvas/>", {"id": "canvas_2" + task.id});                
-        $("#canvas_holder_2").append(canvas_2);          
-        $("#canvas_holder_2" + task.id).dragscrollable({dragSelector:'#canvas_2' + task.id});
-        task.canvas_2 = document.getElementById('canvas_2' + task.id);
-        task.ctx_2 = document.getElementById("canvas_2" + task.id).getContext('2d');
-        task.scale_2 = 0.9;
-        task.pagination_2 = (task.info.page === undefined);
-		task.pageNum_2 = task.info.page || 1;
+
+        if(task.info.id=="1"||task.info.id=="2"){
+            var canvas_2 = $("<canvas/>", {"id": "canvas_2" + task.id});                
+            $("#canvas_holder_2").append(canvas_2);          
+            $("#canvas_holder_2" + task.id).dragscrollable({dragSelector:'#canvas_2' + task.id});
+            task.canvas_2 = document.getElementById('canvas_2' + task.id);
+            task.ctx_2 = document.getElementById("canvas_2" + task.id).getContext('2d');
+            task.scale_2 = 0.9;
+            task.pagination_2 = (task.info.page === undefined);
+            task.pageNum_2 = task.info.page || 1;
+        }
+        
 
       PDFJS.getDocument("/static/"+task.info.pdfName).then(function getPdfHelloWorld(_pdfDoc) {
             task.pdfDoc = _pdfDoc;
-			task.pdfDoc_2 = _pdfDoc;
             $("#totalPages").text(task.pdfDoc.numPages);
-            $("#totalPages_2").text(task.pdfDoc_2.numPages);
+            if(task.info.id=="1"||task.info.id=="2"){
+               task.pdfDoc_2 = _pdfDoc;
+                $("#totalPages_2").text(task.pdfDoc_2.numPages);
+            }
+
             deferred.resolve(task);
         });
     }
@@ -358,7 +372,10 @@ pybossa.taskLoaded(function(task, deferred){
 pybossa.presentTask(function(task, deferred){
     loadUserProgress();
     if ( !$.isEmptyObject(task) ) {
-        
+        $('#task2_confidence').hide();
+        $('#MultipleChoice').hide();
+        $('#T5info').hide();
+
         switch(task.info.id){
             //TASK 1
             case "1":
@@ -367,7 +384,7 @@ pybossa.presentTask(function(task, deferred){
             
             //TASK 2    
             case "2":
-                $('#Titulo').html("For the articles shown below, please indicate if they belong to the same author.  (<strong>"+task.info.author1+"</strong>)?");
+                $('#Titulo').html("For the articles shown below, please indicate if they belong to the same author (<strong>"+task.info.author1+"</strong>).");
                 break;
             
             //TASK 3
@@ -411,14 +428,17 @@ pybossa.presentTask(function(task, deferred){
         }
 
         if(task.info.id=="5"){ //TASK 5
+            $('#YesNoIDK').show();
             $('#T5info').show();
             $('#T5infoTitle').html("Copy and paste the affiliation of the main author here:");
-            $('#t6button').remove();
+            $('#t6button').hide();
         }
 
         if(task.info.id=="6"){ //TASK 6
+            $('#YesNoIDK').hide();
             $('#T5info').show();
             $('#T5infoTitle').html("Copy and paste the method here:");
+            $('#t6button').show();
         }
 
 
@@ -426,7 +446,12 @@ pybossa.presentTask(function(task, deferred){
         $("#viewport_" + task.id).show();
         // showPaginationOptions(task);
         renderPage(task);
-        renderPage_2(task);
+
+        //render 2nd pdf
+        if(task.info.id=="1"||task.info.id=="2"){
+            renderPage_2(task);
+        }
+        
         $("#question h1").text(task.info.question);
         $("#task-id").text(task.id);
         $("#loading").hide();
@@ -460,19 +485,20 @@ pybossa.presentTask(function(task, deferred){
             }
         });
         $(".btn-answer").off('click').on('click', function(){
+
             switch(task.info.id){
                 case "1":
                     var answer = {'answer': $(this).attr("value")};
                     break;
                 case "2":
-                    if(document.getElementById('confidenceInput').value!=null){
+                    if(document.getElementById('confidenceInput').value==""||document.getElementById('confidenceInput').value==null){
+                        pybossaNotify("Ooops! You have to fill all the fields.", true, "error");
+                    }
+                    else{
                         var answer = {
                             'answer': $(this).attr("value"),
                             'confidence': document.getElementById('confidenceInput').value
                         };
-                    }
-                    else{
-                        pybossaNotify("Ooops! You have to fill all the fields.", true, "error");
                     }
                     break;
 
@@ -481,38 +507,39 @@ pybossa.presentTask(function(task, deferred){
                     break;
                 
                 case "4":
-                    if(document.getElementById('fname').value!=null){
+                    if(document.getElementById('fname').value==""||document.getElementById('fname').value==null){
+                        pybossaNotify("Ooops! You have to fill all the fields.", true, "error");
+                    }
+                    else{
                         var answer = {
                             'answer': $('#multi-select').val(),
                             'reasoning': document.getElementById('fname').value
                         };
                     }
-                    else{
-                        pybossaNotify("Ooops! You have to fill all the fields.", true, "error");
-                    }
                     break;
                 
                 case "5":
-                    if(document.getElementById('text').value!=null){
-                        var answer = {
-                            'answer': $(this).attr("value"),
-                            'info': document.getElementById('text').value
-                        };
+                    if(document.getElementById('textT5').value==""||document.getElementById('textT5').value==null){
+                        pybossaNotify("Ooops! You have to fill all the fields.", true, "error");
                     }
                     else{
-                        pybossaNotify("Ooops! You have to fill all the fields.", true, "error");
+                        var answer = {
+                            'answer': $(this).attr("value"),
+                            'info': document.getElementById('textT5').value
+                        };
+                        document.getElementById('textT5').value="";
                     }
                     break;
                 
                 case "6":
-                    if(document.getElementById('text').value!=null){
-                        var answer = {
-                            'answer': $(this).attr("value"),
-                            'info': document.getElementById('text').value
-                        };
+                    if(document.getElementById('textT5').value==""||document.getElementById('textT5').value==null){
+
+                        pybossaNotify("Ooops! You have to fill all the fields.", true, "error");
                     }
                     else{
-                        pybossaNotify("Ooops! You have to fill all the fields.", true, "error");
+                        var answer = {
+                            'answer': document.getElementById('textT5').value
+                        };
                     }
                     break;
                 
@@ -521,7 +548,7 @@ pybossa.presentTask(function(task, deferred){
             }
 
             if (typeof answer != 'undefined') {
-                $("#viewport_" + task.id).hide();
+                $("#viewport_" + task.id).remove();
                 pybossa.saveTask(task.id, answer).done(function(){
                     deferred.resolve();
                     //$("#success").fadeIn();
