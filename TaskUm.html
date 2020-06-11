@@ -45,7 +45,8 @@
             
             <p id="task2_confidence">
                 <label>What is your level of confidence about this decision? [1 to 5]   </label>
-                <input type="number" id="confidenceInput" name="confidenceInput" min="1" max="5">
+                <input type="text" size="5" >
+		
             </p>
 
             <div id="T5info">
@@ -485,79 +486,13 @@ pybossa.presentTask(function(task, deferred){
             }
         });
         $(".btn-answer").off('click').on('click', function(){
-
-            switch(task.info.id){
-                case "1":
-                    var answer = {'answer': $(this).attr("value")};
-                    break;
-                case "2":
-                    if(document.getElementById('confidenceInput').value==""||document.getElementById('confidenceInput').value==null){
-                        pybossaNotify("Ooops! You have to fill all the fields.", true, "error");
-                    }
-                    else{
-                        var answer = {
-                            'answer': $(this).attr("value"),
-                            'confidence': document.getElementById('confidenceInput').value
-                        };
-                    }
-                    break;
-
-                case "3":
-                    var answer = {'answer': $(this).attr("value")};
-                    break;
-                
-                case "4":
-                    if(document.getElementById('fname').value==""||document.getElementById('fname').value==null){
-                        pybossaNotify("Ooops! You have to fill all the fields.", true, "error");
-                    }
-                    else{
-                        var answer = {
-                            'answer': $('#multi-select').val(),
-                            'reasoning': document.getElementById('fname').value
-                        };
-                    }
-                    break;
-                
-                case "5":
-                    if(document.getElementById('textT5').value==""||document.getElementById('textT5').value==null){
-                        pybossaNotify("Ooops! You have to fill all the fields.", true, "error");
-                    }
-                    else{
-                        var answer = {
-                            'answer': $(this).attr("value"),
-                            'info': document.getElementById('textT5').value
-                        };
-                        document.getElementById('textT5').value="";
-                    }
-                    break;
-                
-                case "6":
-                    if(document.getElementById('textT5').value==""||document.getElementById('textT5').value==null){
-
-                        pybossaNotify("Ooops! You have to fill all the fields.", true, "error");
-                    }
-                    else{
-                        var answer = {
-                            'answer': document.getElementById('textT5').value
-                        };
-                    }
-                    break;
-                
-                default:
-                    break;
-            }
-
-            if (typeof answer != 'undefined') {
-                $("#viewport_" + task.id).remove();
-                pybossa.saveTask(task.id, answer).done(function(){
-                    deferred.resolve();
-                    //$("#success").fadeIn();
-                    //setTimeout(function() { $("#success").fadeOut() }, 2000);
-                })
-            }
-            else {
-                pybossaNotify("Ooops! Something went wrong!", true, "error");
-            }
+            var answer = $("textarea#text").val();
+            $("#viewport_" + task.id).hide();
+            pybossa.saveTask(task.id, answer).done(function(data){
+                deferred.resolve();
+                $("#success").fadeIn();
+                setTimeout(function() { $("#success").fadeOut() }, 2000);
+            })
         });
     }
     else {
